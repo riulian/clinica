@@ -1,0 +1,11 @@
+{{extend 'layout.html'}}
+Actual {{=A('Luni',_href=URL('vdata',args=[1]),_class="input btn btn-primary")}} {{=A('Marti',_href=URL('vdata',args=[2]),_class="input btn btn-primary")}} {{=A('Miercuri',_href=URL('vdata',args=[3]),_class="input btn btn-primary")}}
+{{=A('Joi',_href=URL('vdata',args=[4]),_class="input btn btn-primary")}} {{=A('Vineri',_href=URL('vdata',args=[5]),_class="input btn btn-primary")}} {{=A('Sambata',_href=URL('vdata',args=[6]),_class="input btn btn-primary")}} 
+{{=A('Duminica',_href=URL('vdata',args=[7]),_class="input btn btn-primary")}} Saptamana viitoare {{=A('Luni',_href=URL('vdata',args=[8]),_class="input btn btn-primary")}} {{=A('Marti',_href=URL('vdata',args=[9]),_class="input btn btn-primary")}} {{=A('Miercuri',_href=URL('vdata',args=[10]),_class="input btn btn-primary")}}
+{{=A('Joi',_href=URL('vdata',args=[11]),_class="input btn btn-primary")}} {{=A('Vineri',_href=URL('vdata',args=[12]),_class="input btn btn-primary")}} {{=A('Sambata',_href=URL('vdata',args=[13]),_class="input btn btn-primary")}} 
+{{=A('Duminica',_href=URL('vdata',args=[14]),_class="input btn btn-primary")}}
+<br><h6 style="display: inline">Orarul pentru  {{=dataa}}</h6> <h6 style="display: inline;color:white;">{{=dataa}}</h6>
+<div style="font-size: 70%;">
+{{=grid_orar}}
+</div>
+{{=ziua_romana1}}

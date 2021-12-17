@@ -1,0 +1,7 @@
+{{extend 'layout.html'}}
+
+<h6 style="display: inline">Orarul pentru astazi {{=dataa}}</h6> <h6 style="display: inline;color:white;">{{=dataa}}</h6>
+
+<div style="font-size: 70%;">
+{{=grid_orar}}
+</div>

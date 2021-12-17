@@ -1,0 +1,452 @@
+import datetime
+# -*- coding: utf-8 -*-
+# -------------------------------------------------------------------------
+# This is a sample controller
+# this file is released under public domain and you can use without limitations
+# -------------------------------------------------------------------------
+
+# ---- example index page ----
+        
+def test():
+    x ={'pacienti.nume' : '1'}
+    y=db.pacienti
+    z=[db.pacienti.camere,db.pacienti.nume]
+    grid = SQLFORM.grid(y,fields=z,headers=x)
+    
+    return locals()
+
+def orar():
+    data_azi = datetime.datetime.now().strftime("%d-%m-%Y") #este doar pt a imi afisa in View. Nu o folosesc in calcule 15-08-2020
+    zile_sapt = {"Monday": 1,"Tuesday": 2,"Wednesday": 3,"Thursday": 4,"Friday": 5,"Saturday": 6,"Sunday": 7}
+    #dataa = datetime.datetime.now().date() #aceasta o sa o folosesc in calcule
+    dataa = datetime.date(2020, 8, 15) # subtitui dataa de mai sus cu aceasta pt teste
+    nr_zi = (zile_sapt[dataa.strftime("%A")]) # aici imi da un integer a cata zi din saptamana este (in cazul nostru 6). Deci urmeaza sa generez programul pe 2 zile
+    nr_copii_sablon = 8-nr_zi
+    este_generat = db(db.orar.dataa ==dataa).count() #verific daca s-au introdus sabloanele in tabela orar. Daca count>0 s-au introdus. Daca count=0 le introduc acum in numar de nr_copii_sabon ori.
+    if este_generat == 0:
+        row_sablon = db(db.orar_sablon).select()
+        i=0
+        while i<nr_copii_sablon:
+            for row_s in row_sablon:
+                db.orar.insert(row_s.all)
+            i=i+1
+        
+    
+    data_sf = (db(db.orar_t).select().last()).dataa #aceasta este data ultima introdusa din programul terapeutilor pt a vedea pana la ce data pot genera orarul
+    ver_int = db(db.orar_p.dataa==dataa).count()
+    datele=[]
+    if ver_int == 0:
+        row_pacienti = db(db.pacienti.inceput_tt == dataa).select()
+        for row in row_pacienti:
+            db.orar_p.insert(dataa=row.inceput_tt,pacient=row.nume,pacient_id=row.id,camere=row.camere,terapii_necesare=row.terapii_necesare,terapii_importante=row.terapii_importante,terapii_nu=row.terapii_necesare,cicluri=0,p_or_a=row.p_or_a,ora_in=row.ora_in,ora_out=row.ora_out)
+
+
+
+    grid = SQLFORM.grid(db.orar_p,user_signature=False,csv=False)
+    form = SQLFORM.factory(Field('dataa','date',format=('%Y-%m-%d'),label='Data:'),Field('question', requires=IS_NOT_EMPTY()))
+    fields_orar_sablon = [db.orar_sablon.dataa,db.orar_sablon.ora,db.orar_sablon.info_generale,db.orar_sablon.pacient_1,db.orar_sablon.pacient_2,db.orar_sablon.pacient_3,db.orar_sablon.pacient_4,db.orar_sablon.pacient_5,db.orar_sablon.pacient_6,db.orar_sablon.pacient_7,db.orar_sablon.pacient_8,db.orar_sablon.pacient_9,db.orar_sablon.pacient_10,db.orar_sablon.pacient_11,db.orar_sablon.pacient_12,db.orar_sablon.pacient_13,db.orar_sablon.pacient_14,db.orar_sablon.pacient_15,db.orar_sablon.pacient_16,db.orar_sablon.pacient_17,db.orar_sablon.pacient_18,db.orar_sablon.pacient_19,db.orar_sablon.pacient_20]
+
+    header_o ={'orar_sablon.dataa':'Data astazi','orar_sablon.ora':'Ora si Data','orar_sablon.pacient_1' : 'Pacient_______________________________1','orar_sablon.pacient_2' : 'Pacient 2________________________________','orar_sablon.pacient_3' : 'Pacient 3________________________________','orar_sablon.pacient_4' : 'Pacient 4________________________________','orar_sablon.pacient_5' : 'Pacient 5________________________________','orar_sablon.pacient_6' : 'Pacient 6________________________________','orar_sablon.pacient_7' : 'Pacient 7________________________________','orar_sablon.pacient_8' : 'Pacient 8________________________________','orar_sablon.pacient_9' : 'Pacient 9________________________________','orar_sablon.pacient_10' : 'Pacient 10________________________________','orar_sablon.pacient_11' : 'Pacient 11________________________________','orar_sablon.pacient_12' : 'Pacient 12________________________________','orar_sablon.pacient_13' : 'Pacient 13________________________________','orar_sablon.pacient_14' : 'Pacient14________________________________','orar_sablon.pacient_15' : 'Pacient 15________________________________','orar_sablon.pacient_16' : 'Pacient 16________________________________','orar_sablon.pacient_17' : 'Pacient 17________________________________','orar_sablon.pacient_18' : 'Pacient 18________________________________','orar_sablon.pacient_19' : 'Pacient 19________________________________','orar_sablon.pacient_20' : 'Pacient 20________________________________'}    
+    grid1 = SQLFORM.grid(db.orar_sablon,headers= header_o,fields = fields_orar_sablon,maxtextlengths={'orar_sablon.ora':30,'orar_sablon.info_generale':36,'orar_sablon.pacient_1':50},user_signature=False,csv=True,paginate=30,create=False,searchable=False)
+    #form.element('textarea[_name=question]')['_style'] = 'width:150px;height:50px;'
+    return locals()
+
+def gen_orar_now(): #generare orar pentru saptamana aceasta
+    pass
+    return locals()
+
+def gen_orar_next(): #generare orar pentru saptamana viitoare
+    pass
+    return locals()
+
+def index():
+    grid = SQLFORM.grid(db.terapii,fields=[db.terapii.nume,db.terapii.tip,db.terapii.durata,db.terapii.cuplaj_cu,db.terapii.posibil_inainte_de,db.terapii.imposibil_inainte_de,db.terapii.posibil_dupa,db.terapii.imposibil_dupa,db.terapii.simultan_maxim,db.terapii.cand_se_poate,db.terapii.pauza_aceeasi_terapie,db.terapii.interval_inceput_ora,db.terapii.interval_inceput_minut,db.terapii.interval_sfarsit_ora,db.terapii.interval_sfarsit_minut,db.terapii.mai_multe_intervale,db.terapii.interval2_inceput_ora,db.terapii.interval2_inceput_minut,db.terapii.interval2_sfarsit_ora,db.terapii.interval2_sfarsit_minut,db.terapii.interval3_inceput_ora,db.terapii.interval3_inceput_minut,db.terapii.interval3_sfarsit_ora,db.terapii.interval3_sfarsit_minut,db.terapii.cine_face,db.terapii.cine_nu_face,db.terapii.weekend,db.terapii.Obs],user_signature=False,paginate=8,csv=False)
+    return locals()
+
+def terapii():
+    grid = SQLFORM.grid(db.terapii,user_signature=False,paginate=8,csv=False)
+    return locals()
+
+def terapeuti():
+    grid = SQLFORM.grid(db.terapeuti,fields=[db.terapeuti.nume,db.terapeuti.ce_terapii_face,db.terapeuti.ce_terapii_nu_face],maxtextlengths={'terapeuti.ce_terapii_face':400,'terapeuti.ce_terapii_nu_face':400},user_signature=False,paginate=10,csv=False)
+    return locals()
+
+def camere():
+# grid = SQLFORM.grid(db.camere,headers={'camere.camera':'Camera','camere.pat':'Pat','camere.nr_maxim_locuri':'Nr maxim locuri','camere.nr_paturi_simple':'Nr paturi simple','camere.nr_paturi_duble':'Nr paturi #duble'},user_signature=False,paginate=10,csv=False)
+    grid = SQLFORM.grid(db.camere,fields=[db.camere.camera,db.camere.pat,db.camere.max_locuri,db.camere.nr_paturi_simple,db.camere.nr_paturi_duble],user_signature=False,paginate=10,csv=False)
+    
+    return locals()
+
+
+def ver_data(form): #in aceasta functie pot pune orice fel de conditii inainte de a valida un add record 
+    id = form.vars.id
+    inceput_tt = form.vars.inceput_tt
+    sfarsit_tt = form.vars.sfarsit_tt
+    camere = form.vars.camere
+    if inceput_tt>sfarsit_tt or camere == None:
+        form.errors= True
+    else:
+        form.errors= False
+
+def ver_data1(form): #in aceasta functie pot pune orice fel de conditii inainte de a valida un add record. aici la ambulatoriu verifica sa fie data de intrare= cu cea de iesire 
+    id = form.vars.id
+    inceput_tt = form.vars.inceput_tt
+    sfarsit_tt = form.vars.sfarsit_tt
+    camere = form.vars.camere
+    if inceput_tt!=sfarsit_tt or camere == None:
+        form.errors= True
+    else:
+        form.errors= False
+
+
+def xx(form): # aceasta functie se apeleaza cand sunt erori in formularul de completare. Aceasta functie se apeleaza si din  fct ver_data fiind apelata : form.errors= True
+    response.flash = 'Eroare. Completeaza corect! '
+
+def do_something(form): # de la pacienti vine aici si x=1
+    
+    session.flash = 'Reusit!'
+    id = form.vars.id
+    nume = form.vars.nume
+    row = db(db.pacienti.id == id).select().first() # linia cu pacientul respectiv care a intrat deja in tabela
+    p_or_a = row.p_or_a
+    
+    if p_or_a=='pacient':
+        x=1
+        redirect(URL('default','ad_terapii',vars=dict(id=id,nume=nume,x=x))) #,p_or_a=p_or_a))
+    else:
+        x=2
+        redirect(URL('default','ad_terapii',vars=dict(id=id,nume=nume,x=x))) #,p_or_a=p_or_a))
+    
+def do_something1(form): #de la ambulatoriu vine aici si x=2
+    
+    session.flash = 'Reusit!'
+    id = form.vars.id
+    nume = form.vars.nume
+    #p_or_a = form.vars.p_or_a
+    x=2
+    redirect(URL('default','ad_terapii',vars=dict(id=id,nume=nume,x=x)))
+
+def pacienti():
+    db.pacienti.inceput_ss.writable = False
+    db.pacienti.inceput_ss.readable = False
+    db.pacienti.sfarsit_ss.writable = False
+    db.pacienti.sfarsit_ss.readable = False
+    db.pacienti.ora_in.writable = False
+    db.pacienti.ora_in.readable = False
+    db.pacienti.ora_out.writable = False
+    db.pacienti.ora_out.readable = False
+    db.pacienti.terapii_necesare.writable = False
+    #db.pacienti.terapii_necesare.readable = False
+    db.pacienti.terapii_importante.writable = False
+    #db.pacienti.terapii_importante.readable = False
+    db.pacienti.p_or_a.default = 'pacient'
+    db.pacienti.p_or_a.writable = False
+    #db.pacienti.p_or_a.readable = False
+    #abc=1
+    callback = lambda *args: redirect(URL('default','pacienti'))
+    querry = db.pacienti.id.belongs([0])
+   
+    grid = SQLFORM.grid(db.pacienti,orderby=~db.pacienti.inceput_tt,fields = [db.pacienti.camere,db.pacienti.nume,db.pacienti.din_localitatea,db.pacienti.inceput_tt,db.pacienti.sfarsit_tt,db.pacienti.terapii_necesare,db.pacienti.terapii_importante,db.pacienti.p_or_a],oncreate=do_something,onfailure=xx,onupdate=do_something,onvalidation=ver_data,user_signature=False,paginate=10,csv=False)
+#     grid = SQLFORM.grid(db.pacienti, fields = #[db.pacienti.camere,db.pacienti.nume,db.pacienti.din_localitatea,db.pacienti.inceput_t,db.pacienti.sfarsit_t,db.pacienti.inceput_s,db.pacienti.sfarsit_s],user_signature=False,paginate=10,csv=False) #este cu inceput/sfarsit cazare
+    
+    return locals()
+
+def ambulatoriu():
+    db.pacienti.inceput_ss.writable = False
+    db.pacienti.inceput_ss.readable = False
+    db.pacienti.sfarsit_ss.writable = False
+    db.pacienti.sfarsit_ss.readable = False
+    db.pacienti.terapii_necesare.writable = False
+    #db.pacienti.terapii_necesare.readable = False
+    db.pacienti.terapii_importante.writable = False
+    #db.pacienti.terapii_importante.readable = False
+    db.pacienti.p_or_a.writable = False
+    #db.pacienti.p_or_a.readable = False
+    db.pacienti.p_or_a.default = 'ambulatoriu'
+    
+    #row = db(db.camere.select(camere.id==27))
+    #cam=row.camera
+    #db.pacienti.camere.default = db(db.pacienti.camere == 27).select().first().camere
+    db.pacienti.camere.default = 27
+    callback = lambda *args: redirect(URL('default','pacienti'))
+    querry = db.pacienti.id.belongs([0])
+   
+    grid = SQLFORM.grid(db.pacienti.p_or_a=='ambulatoriu',orderby=~db.pacienti.inceput_tt,fields = [db.pacienti.camere,db.pacienti.nume,db.pacienti.din_localitatea,db.pacienti.inceput_tt,db.pacienti.sfarsit_tt,db.pacienti.terapii_necesare,db.pacienti.p_or_a],oncreate=do_something1,onfailure=xx,onupdate=do_something1,onvalidation=ver_data1,user_signature=False,paginate=10,csv=False)
+#     grid = SQLFORM.grid(db.pacienti, fields = #[db.pacienti.camere,db.pacienti.nume,db.pacienti.din_localitatea,db.pacienti.inceput_t,db.pacienti.sfarsit_t,db.pacienti.inceput_s,db.pacienti.sfarsit_s],user_signature=False,paginate=10,csv=False) #este cu inceput/sfarsit cazare
+    return locals()
+
+
+def ad_terapii(): #adauga terapii pentru pacienti dar si pentru ambulatoriu iar din functia mm, ma trimite in ad_terapii2
+    
+    y = request.vars
+    x=y['x']
+    
+    form = SQLFORM.grid(db.terapii,fields=[db.terapii.nume,db.terapii.tip],csv=False,paginate=50,create=False,deletable=False,searchable=False,editable=False,details=False,user_signature=False,selectable = [('Adauga terapii',lambda ids :  redirect(URL('default', 'mm', vars=dict(id=ids,id1 = y['id'],titlu1 = y['nume'],tip1=y['tip1'],x=x))))])
+    
+    if form.elements('th'): #acest if imi da posibilitatea sa selectez tot(checkbox-urile): ALL
+            form.elements('th')[0].append(SPAN('All', BR(), INPUT(_type='checkbox',
+    _onclick="jQuery('input:checkbox').not(this).prop('checked', this.checked);"
+    )))
+   
+    #selectable = [('button label1', lambda...), ('button label2', lambda ...)]    
+                
+    return locals()
+
+def ad_terapii2(): #este pt a adauga terapiile imortante dupa ce adaug terapiile
+    
+    y = request.vars
+    form = SQLFORM.grid(db.terapii,fields=[db.terapii.nume,db.terapii.tip],csv=False,paginate=50,create=False,deletable=False,searchable=False,editable=False,details=False,user_signature=False,selectable = [('Adauga terapii',lambda ids :  redirect(URL('default', 'mm1', vars=dict(id=ids,id1 = y['id'],titlu1 = y['nume'],tip1=y['tip1']))))])
+    
+    if form.elements('th'): #acest if imi da posibilitatea sa selectez tot(checkbox-urile): ALL
+        form.elements('th')[0].append(SPAN('All', BR(), INPUT(_type='checkbox',
+    _onclick="jQuery('input:checkbox').not(this).prop('checked', this.checked);"
+    )))
+    #selectable = [('button label1', lambda...), ('button label2', lambda ...)]    
+  
+    return locals()
+
+
+def mm(): 
+    y = request.vars # este un set de dictionare <Storage {'records': [], 'id': ['1', '2', '3', '4']}>
+    z= y['id']#id-urile selecatate ex:['1', '2', '3', '4']
+    xpa=y['x']
+    zz=y['nume']# are valoarea None => nu imi foloseste
+    film_id = y['id1']
+    film_titlu = y['titlu1']
+    tip_tip = y['tip1']
+    ver_list = isinstance(z, str) # verifica daca z este un string adica doar un element selectat=>True sau daca este o lista adica mai multe elemente selectate sau niciunul: =>False
+    if ver_list == False:
+        if y['id']!=None:
+            l = len(y['id'])
+        else:
+            l=0
+
+        if l!=0:
+            datele = []
+            for i in range(l):
+                datele.append (y['id'][i] ) 
+            xx=[]
+            querry=db.terapii.id.belongs(datele)
+            form = SQLFORM.grid(querry) # grid doar cu id-urile selectate
+            form1 = SQLFORM.grid(querry) # grid doar cu id-urile selectate
+            xxx = db(db.terapii.id.belongs(datele)).select()  #inregistrarile id-urilor selectate
+            for x in xxx:
+                xx.append(x.nume) #pune in lista xx categoriile selectate ex: ['romantic', 'documentar', 'istoric', 'comedie']
+
+            row = db(db.pacienti.id == film_id).select().first()
+            db(db.pacienti.id == film_id).select().first().update_record(terapii_necesare=xx)
+
+            #redirect(URL('default', 'ad_actor',vars=dict(id1=film_id,xx=xx,titlu1=film_titlu,row1=row)))
+            if xpa=='1':
+                redirect(URL('default','ad_terapii2',vars=dict(id=film_id,nume=film_titlu)))
+            else:
+                redirect(URL('default','ambulatoriu'))
+                
+        else:
+            if xpa=='1':
+                redirect(URL('default','ad_terapii2',vars=dict(id=film_id,nume=film_titlu)))
+            else:
+                redirect(URL('default','ambulatoriu'))
+                
+    else:
+        if y['id']!=None:
+            l = 1
+        else:
+            l=0
+
+        if l!=0:
+            datele = []
+            datele.append (y['id']) 
+            xx=[]
+            querry=db.terapii.id.belongs(datele)
+            form = SQLFORM.grid(querry) # grid doar cu id-urile selectate
+            form1 = SQLFORM.grid(querry) # grid doar cu id-urile selectate
+            xxx = db(db.terapii.id.belongs(datele)).select()  #inregistrarile id-urilor selectate
+            for x in xxx:
+                xx.append(x.nume) #pune in lista xx categoriile selectate ex: ['romantic', 'documentar', 'istoric', 'comedie']
+
+            row = db(db.pacienti.id == film_id).select().first()
+            db(db.pacienti.id == film_id).select().first().update_record(terapii_necesare=xx)
+
+            #redirect(URL('default', 'ad_actor',vars=dict(id1=film_id,xx=xx,titlu1=film_titlu,row1=row)))
+            if xpa=='1':
+                redirect(URL('default','ad_terapii2',vars=dict(id=film_id,nume=film_titlu)))
+            else:
+                redirect(URL('default','ambulatoriu'))
+                
+        else:
+            if xpa=='1':
+                redirect(URL('default','ad_terapii2',vars=dict(id=film_id,nume=film_titlu)))
+            else:
+                redirect(URL('default','ambulatoriu'))
+                
+    return locals()
+
+def mm1(): # este pt a adauga terapiile importante dupa ce am adaugat terapiile
+    y = request.vars # este un set de dictionare <Storage {'records': [], 'id': ['1', '2', '3', '4']}>
+    z= y['id']#id-urile selecatate ex:['1', '2', '3', '4']
+    zz=y['nume']# are valoarea None => nu imi foloseste
+    film_id = y['id1']
+    film_titlu = y['titlu1']
+    tip_tip = y['tip1']
+    ver_list = isinstance(z, str) # verifica daca z este un string adica doar un element selectat=>True sau daca este o lista adica mai multe elemente selectate sau niciunul: =>False
+    if ver_list == False:
+        if y['id']!=None:
+            l = len(y['id'])
+        else:
+            l=0
+
+        if l!=0:
+            datele = []
+            for i in range(l):
+                datele.append (y['id'][i] ) 
+            xx=[]
+            querry=db.terapii.id.belongs(datele)
+            form = SQLFORM.grid(querry) # grid doar cu id-urile selectate
+            form1 = SQLFORM.grid(querry) # grid doar cu id-urile selectate
+            xxx = db(db.terapii.id.belongs(datele)).select()  #inregistrarile id-urilor selectate
+            for x in xxx:
+                xx.append(x.nume) #pune in lista xx categoriile selectate ex: ['romantic', 'documentar', 'istoric', 'comedie']
+
+            row = db(db.pacienti.id == film_id).select().first()
+            db(db.pacienti.id == film_id).select().first().update_record(terapii_importante=xx)
+
+            #redirect(URL('default', 'ad_actor',vars=dict(id1=film_id,xx=xx,titlu1=film_titlu,row1=row)))
+            redirect(URL('default', 'pacienti'))
+        else:
+            redirect(URL('default', 'pacienti'))
+            #redirect(URL('default', 'ad_actor',vars=dict(id1=film_id,titlu1=film_titlu)))
+            pass
+    else:
+        if y['id']!=None:
+            l = 1
+        else:
+            l=0
+
+        if l!=0:
+            datele = []
+            datele.append (y['id']) 
+            xx=[]
+            querry=db.terapii.id.belongs(datele)
+            form = SQLFORM.grid(querry) # grid doar cu id-urile selectate
+            form1 = SQLFORM.grid(querry) # grid doar cu id-urile selectate
+            xxx = db(db.terapii.id.belongs(datele)).select()  #inregistrarile id-urilor selectate
+            for x in xxx:
+                xx.append(x.nume) #pune in lista xx categoriile selectate ex: ['romantic', 'documentar', 'istoric', 'comedie']
+
+            row = db(db.pacienti.id == film_id).select().first()
+            db(db.pacienti.id == film_id).select().first().update_record(terapii_importante=xx)
+
+            #redirect(URL('default', 'ad_actor',vars=dict(id1=film_id,xx=xx,titlu1=film_titlu,row1=row)))
+            redirect(URL('default', 'pacienti'))
+        else:
+            redirect(URL('default', 'pacienti'))
+            #redirect(URL('default', 'ad_actor',vars=dict(id1=film_id,titlu1=film_titlu)))
+            pass
+    return locals()
+
+def orar_t():
+    grid = SQLFORM.grid(db.orar_t,user_signature=False,csv=False,orderby=~db.orar_t.dataa,onvalidation=ver_data2,onfailure=xx,oncreate=do_something2,onupdate=do_something2)
+    
+    return locals()
+
+def ver_data2(form):#in aceasta functie pot pune orice fel de conditii inainte de a valida un add record ziua urmatoare terapeuti
+    dataa = form.vars.dataa
+    controll = form.vars.control #valoarea checkboxului nevalidata=None
+    len_tab = db(db.orar_t).count()# verific daca se afla vreo inregistrare in tabela, daca len_tab>0 se afla
+    len1=0
+    len1 = db(db.orar_t.dataa==dataa).count()#verific daca exista deja in tabela aceasta inregistrare-este pt update
+    #len1=0
+    if len1==0: #aici se adauga si pe else se face update
+        if len_tab>0: #marimea tabelei
+            row = db(db.orar_t).select().last()
+            if (dataa+datetime.timedelta(days=-1))==row.dataa or controll != None:  #check-box-urile le verific cu None care inseamna neselectat
+                form.errors= False
+            else:
+                form.errors= True
+        else:
+            form.errors= False
+    else:
+        if len_tab>0: #lungimea tabelei
+            row = db(db.orar_t.dataa==dataa).select().first()
+            if ((dataa+datetime.timedelta(days=0))==row.dataa or controll != None):  #check-box-urile le verific cu None care inseamna neselectat
+                form.errors= False
+            else:
+                form.errors= True
+        else:
+            form.errors= False
+
+def do_something2(form):
+    session.flash = 'Reusit!'
+    id = form.vars.id
+    dataa = form.vars.dataa
+    row = db(db.orar_t.id == id).select().first()
+    if dataa==row.dataa:
+        form.errors=False
+        
+    else:
+        form.errors=True
+
+             
+
+
+def orar_sablon():
+    fields_orar_sablon = [db.orar_sablon.ora,db.orar_sablon.info_generale,db.orar_sablon.pacient_1,db.orar_sablon.pacient_2,db.orar_sablon.pacient_3,db.orar_sablon.pacient_4,db.orar_sablon.pacient_5,db.orar_sablon.pacient_6,db.orar_sablon.pacient_7,db.orar_sablon.pacient_8,db.orar_sablon.pacient_9,db.orar_sablon.pacient_10,db.orar_sablon.pacient_11,db.orar_sablon.pacient_12,db.orar_sablon.pacient_13,db.orar_sablon.pacient_14,db.orar_sablon.pacient_15,db.orar_sablon.pacient_16,db.orar_sablon.pacient_17,db.orar_sablon.pacient_18,db.orar_sablon.pacient_19,db.orar_sablon.pacient_20]
+
+    header_o ={'orar_sablon.ora':'Ora si Data','orar_sablon.pacient_1' : 'Pacient_______________________________1','orar_sablon.pacient_2' : 'Pacient 2________________________________','orar_sablon.pacient_3' : 'Pacient 3________________________________','orar_sablon.pacient_4' : 'Pacient 4________________________________','orar_sablon.pacient_5' : 'Pacient 5________________________________','orar_sablon.pacient_6' : 'Pacient 6________________________________','orar_sablon.pacient_7' : 'Pacient 7________________________________','orar_sablon.pacient_8' : 'Pacient 8________________________________','orar_sablon.pacient_9' : 'Pacient 9________________________________','orar_sablon.pacient_10' : 'Pacient 10________________________________','orar_sablon.pacient_11' : 'Pacient 11________________________________','orar_sablon.pacient_12' : 'Pacient 12________________________________','orar_sablon.pacient_13' : 'Pacient 13________________________________','orar_sablon.pacient_14' : 'Pacient14________________________________','orar_sablon.pacient_15' : 'Pacient 15________________________________','orar_sablon.pacient_16' : 'Pacient 16________________________________','orar_sablon.pacient_17' : 'Pacient 17________________________________','orar_sablon.pacient_18' : 'Pacient 18________________________________','orar_sablon.pacient_19' : 'Pacient 19________________________________','orar_sablon.pacient_20' : 'Pacient 20________________________________'}     
+    grid = SQLFORM.grid(db.orar_sablon,headers= header_o,fields = fields_orar_sablon,maxtextlengths={'orar_sablon.ora':30,'orar_sablon.info_generale':36,'orar_sablon.pacient_1':50},user_signature=False,csv=True,paginate=30,create=False,searchable=False)
+    #,<col id="orar_sablon-ora" data-column="1">
+    return locals()
+        
+
+def useri():
+    grid = SQLFORM.grid(db.auth_user,paginate=10,csv=False)
+    return locals()
+
+# ---- API (example) -----
+@auth.requires_login()
+def api_get_user_email():
+    if not request.env.request_method == 'GET': raise HTTP(403)
+    return response.json({'status':'success', 'email':auth.user.email})
+
+# ---- Smart Grid (example) -----
+@auth.requires_membership('admin') # can only be accessed by members of admin groupd
+def grid():
+    response.view = 'generic.html' # use a generic view
+    tablename = request.args(0)
+    if not tablename in db.tables: raise HTTP(403)
+    grid = SQLFORM.smartgrid(db[tablename], args=[tablename], deletable=False, editable=False)
+    return dict(grid=grid)
+
+# ---- Embedded wiki (example) ----
+def wiki():
+    auth.wikimenu() # add the wiki to the menu
+    return auth.wiki() 
+
+# ---- Action for login/register/etc (required for auth) -----
+def user():
+    """
+    exposes:
+    http://..../[app]/default/user/login
+    http://..../[app]/default/user/logout
+    http://..../[app]/default/user/register
+    http://..../[app]/default/user/profile
+    http://..../[app]/default/user/retrieve_password
+    http://..../[app]/default/user/change_password
+    http://..../[app]/default/user/bulk_register
+    use @auth.requires_login()
+        @auth.requires_membership('group name')
+        @auth.requires_permission('read','table name',record_id)
+    to decorate functions that need access control
+    also notice there is http://..../[app]/appadmin/manage/auth to allow administrator to manage users
+    """
+    return dict(form=auth())
+
+# ---- action to server uploaded static content (required) ---
+@cache.action()
+def download():
+    """
+    allows downloading of uploaded files
+    http://..../[app]/default/download/[filename]
+    """
+    return response.download(request, db)

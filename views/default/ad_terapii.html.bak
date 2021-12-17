@@ -1,0 +1,8 @@
+{{extend 'layout.html'}}
+<h1>Adauga una sau mai multe terapii pentru pacientul {{=y['nume']}}</h1>
+<!--{{=y}}-->
+{{=form1}}
+
+
+<!--{{=x}}-->
+</br></br>

@@ -1,0 +1,28 @@
+{{extend 'layout.html'}}
+<h1>Terapia individuala importanta pentru pacientul {{=y['nume']}}</h1><br><br><br><br>
+
+<!--{{=y}} -->
+
+<form id="currency" >
+
+    <fieldset class="ntset">
+      
+      <input type="hidden" id="idul" name="idul" value={{=y['id']}}>
+      {{for row in rows:}}
+      {{if ((row.tip=='individuala') and (row.nume in pacientul_in_cauza.terapii_necesare)==True):}}
+      <input type="radio" id="firstcurrency" name="habits2" value='{{=row.nume}}'>
+      <label class="fmt" for="habits2"> {{=row.nume}}</label><br>
+     {{pass}}{{pass}}
+      <br>
+      <p><input type="submit" value="Submit" class="button"> <input type="reset" value="Reset" class="button"></p>
+    </fieldset>
+  </form>
+<script>
+
+var form = document.getElementById('currency');
+form.onsubmit = function(e){
+    var firstcurrency = document.getElementById('firstcurrency').value;
+    var idul = document.getElementById('idul').value;
+    e.target.action = "mm2";}
+
+</script>

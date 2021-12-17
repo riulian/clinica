@@ -1,0 +1,27 @@
+{{extend 'layout.html'}}
+
+{{=A('Luni',_href=URL('vdata',args=[1]))}} {{=A('Marti',_href=URL('vdata',args=[2]))}} {{=A('Miercuri',_href=URL('vdata',args=[3]))}}
+{{=A('Joi',_href=URL('vdata',args=[4]))}} {{=A('Vineri',_href=URL('vdata',args=[5]))}} {{=A('Sambata',_href=URL('vdata',args=[6]))}} 
+{{=A('Duminica',_href=URL('vdata',args=[7]))}}  &nbsp; &nbsp; &nbsp; &nbsp; {{=A('Luni',_href=URL('vdata',args=[8]))}} {{=A('Marti',_href=URL('vdata',args=[9]))}} {{=A('Miercuri',_href=URL('vdata',args=[10]))}}
+{{=A('Joi',_href=URL('vdata',args=[11]))}} {{=A('Vineri',_href=URL('vdata',args=[12]))}} {{=A('Sambata',_href=URL('vdata',args=[13]))}} 
+{{=A('Duminica',_href=URL('vdata',args=[14]))}}
+<br><h6 style="display: inline;color:rgb(75, 75, 88)">Orarul pentru {{=ziua_romana1}} {{=dataa}}</h6> <h6 style="display: inline;color:white;">{{=dataa}}</h6>
+
+
+
+<style>
+.myDiv {
+  border: 5px outset red;
+  background-color: lightblue;
+  text-align: center;
+  font-size: 70%;  
+}
+</style>
+
+</style>
+<div id="message" class="myDiv">
+{{=grid_orar}}
+</div>
+<!--,_class="input btn btn-primary"-->
+</br>
+<button onclick="window.print()">Print this page</button>
